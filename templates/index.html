@@ -1,146 +1,391 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetOps Dashboard</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <title>NetOps Studio | Router Automation</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-body: #121216;
+            --bg-panel: #1c1c22;
+            --bg-input: #121216;
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #a855f7); /* Indigo to Violet */
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --danger: #ef4444;
+            --terminal-bg: #09090b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: #0f172a; /* Slate dark background */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #e2e8f0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Top Navigation */
         .navbar {
-            background-color: #1e293b;
-            border-bottom: 1px solid #334155;
-        }
-        .main-card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .btn-run {
-            background-color: #3b82f6; /* Blue */
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .btn-run:hover {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            color: white;
-        }
-        .terminal-window {
-            background-color: #0b1120;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .terminal-header {
-            background-color: #1e293b;
-            padding: 10px 15px;
-            font-family: monospace;
-            font-weight: bold;
-            color: #94a3b8;
-            border-bottom: 1px solid #334155;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 72px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
-        .terminal-header i {
-            color: #10b981; /* Green icon */
-            margin-right: 10px;
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        pre {
-            margin: 0;
-            padding: 15px;
-            color: #38bdf8; /* Light blue text */
-            font-family: Consolas, monospace;
-            font-size: 14px;
+
+        .brand i {
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary); /* Override for icon */
+            font-size: 1.5rem;
+        }
+
+        .nav-badge {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Panels */
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .panel-header i {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Form */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Button */
+        .btn-launch {
+            width: 100%;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            margin-top: auto; /* Push to bottom */
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-launch:active {
+            transform: translateY(0);
+        }
+
+        /* Error Box */
+        .error-box {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            color: #fca5a5;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 12px;
+        }
+
+        .error-box i {
+            color: var(--danger);
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        /* Terminal Output Area */
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .terminal {
+            background-color: var(--terminal-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 200px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.8);
+        }
+
+        .terminal-bar {
+            background-color: #18181b;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dots { display: flex; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.r { background-color: #ef4444; }
+        .dot.y { background-color: #f59e0b; }
+        .dot.g { background-color: #10b981; }
+
+        .term-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .term-title i { font-size: 0.7rem; }
+
+        .terminal-content {
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #a5b4fc; /* Light indigo text */
             white-space: pre-wrap;
             word-wrap: break-word;
-            max-height: 400px;
             overflow-y: auto;
+            flex: 1;
+            line-height: 1.7;
         }
-        .alert-danger {
-            background-color: #450a0a;
-            border-color: #7f1d1d;
-            color: #fca5a5;
+
+        /* Empty State */
+        .empty-state {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            color: var(--text-muted);
+            min-height: 400px;
+            background: rgba(28, 28, 34, 0.5);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--border);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--terminal-bg); }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; padding: 0 1rem; }
+            .navbar { padding: 0 1rem; }
+            .empty-state { min-height: 300px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Top Navigation Bar -->
-<nav class="navbar navbar-expand-lg mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            <i class="fa-solid fa-network-wired text-primary me-2"></i>
-            NetOps Automation
-        </a>
-        <span class="navbar-text text-muted">
-            <i class="fa-solid fa-server me-1"></i> Target: 192.168.10.231
-        </span>
-    </div>
-</nav>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fa-solid fa-cube"></i>
+            NetOps Studio
+        </div>
+        <div class="nav-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+            Secure Session
+        </div>
+    </nav>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            
-            <!-- Main Control Panel -->
-            <div class="card main-card p-4 mb-4">
-                <h3 class="mb-3"><i class="fa-solid fa-terminal me-2"></i>Router Command Execution</h3>
-                <p class="text-muted mb-4">Click the button below to connect to the router via Telnet and run the configured commands.</p>
-                
-                <!-- The form that sends the POST request -->
-                <form method="POST">
-                    <button type="submit" class="btn btn-run">
-                        <i class="fa-solid fa-play me-2"></i> Connect & Run Commands
-                    </button>
-                </form>
+    <!-- Main Content -->
+    <div class="main-grid">
+        
+        <!-- Left Configuration Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-server"></i>
+                Connection Details
             </div>
-
-            <!-- Error Handling -->
-            {% if error %}
-                <div class="alert alert-danger d-flex align-items-center" role="alert">
-                    <i class="fa-solid fa-triangle-exclamation fa-2x me-3"></i>
-                    <div>
-                        <h5 class="alert-heading mb-1">Connection Failed</h5>
-                        <p class="mb-0">{{ error }}</p>
+            <div class="panel-body">
+                <form method="POST" style="display: flex; flex-direction: column; height: 100%;">
+                    
+                    <div class="input-group">
+                        <label for="ip_address">Router IP Address</label>
+                        <input type="text" id="ip_address" name="ip_address" class="input-field" value="{{ target_ip }}" placeholder="192.168.1.1" required>
                     </div>
+
+                    <div class="input-group">
+                        <label for="port">Telnet Port</label>
+                        <input type="number" id="port" name="port" class="input-field" value="{{ target_port }}" placeholder="32770" required>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; gap: 8px;">
+                        <i class="fa-solid fa-circle-info" style="margin-top: 2px;"></i>
+                        <span>Commands will be executed automatically upon connection.</span>
+                    </div>
+
+                    <button type="submit" class="btn-launch">
+                        <i class="fa-solid fa-play"></i> Launch Automation
+                    </button>
+
+                </form>
+
+                {% if error %}
+                <div class="error-box">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Execution Failed</strong><br>
+                        <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem;">{{ error }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Terminal Output Panel -->
+        <div class="panel" style="background: transparent; border: none; box-shadow: none; overflow: visible;">
+            
+            {% if results %}
+                <div class="output-container">
+                    {% for command, output in results.items() %}
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <div class="dots">
+                                <div class="dot r"></div>
+                                <div class="dot y"></div>
+                                <div class="dot g"></div>
+                            </div>
+                            <div class="term-title">
+                                <i class="fa-solid fa-terminal"></i> Output: {{ command }}
+                            </div>
+                        </div>
+                        <div class="terminal-content">{{ output }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-code"></i>
+                    <h3 style="color: var(--text-main); font-weight: 600;">Awaiting Execution</h3>
+                    <p style="margin-top: 0.5rem;">Configure parameters and launch to view terminal output.</p>
                 </div>
             {% endif %}
 
-            <!-- Results Handling -->
-            {% if results %}
-                <h4 class="mb-3 mt-4 text-light"><i class="fa-solid fa-check-circle text-success me-2"></i>Execution Results</h4>
-                
-                {% for command, output in results.items() %}
-                    <div class="terminal-window">
-                        <div class="terminal-header">
-                            <i class="fa-solid fa-angle-right"></i> {{ command }}
-                        </div>
-                        <pre>{{ output }}</pre>
-                    </div>
-                {% endfor %}
-                
-            {% endif %}
-
         </div>
-    </div>
-</div>
 
-<!-- Bootstrap JS (Optional, for future interactivity) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+
 </body>
 </html>
