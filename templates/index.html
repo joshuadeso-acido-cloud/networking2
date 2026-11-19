@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetOps Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0f172a; /* Slate dark background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e2e8f0;
+        }
+        .navbar {
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+        }
+        .main-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .btn-run {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .btn-run:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+        .terminal-window {
+            background-color: #0b1120;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .terminal-header {
+            background-color: #1e293b;
+            padding: 10px 15px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+        }
+        .terminal-header i {
+            color: #10b981; /* Green icon */
+            margin-right: 10px;
+        }
+        pre {
+            margin: 0;
+            padding: 15px;
+            color: #38bdf8; /* Light blue text */
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .alert-danger {
+            background-color: #450a0a;
+            border-color: #7f1d1d;
+            color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<nav class="navbar navbar-expand-lg mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fa-solid fa-network-wired text-primary me-2"></i>
+            NetOps Automation
+        </a>
+        <span class="navbar-text text-muted">
+            <i class="fa-solid fa-server me-1"></i> Target: 192.168.10.231
+        </span>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <!-- Main Control Panel -->
+            <div class="card main-card p-4 mb-4">
+                <h3 class="mb-3"><i class="fa-solid fa-terminal me-2"></i>Router Command Execution</h3>
+                <p class="text-muted mb-4">Click the button below to connect to the router via Telnet and run the configured commands.</p>
+                
+                <!-- The form that sends the POST request -->
+                <form method="POST">
+                    <button type="submit" class="btn btn-run">
+                        <i class="fa-solid fa-play me-2"></i> Connect & Run Commands
+                    </button>
+                </form>
+            </div>
+
+            <!-- Error Handling -->
+            {% if error %}
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-1">Connection Failed</h5>
+                        <p class="mb-0">{{ error }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Results Handling -->
+            {% if results %}
+                <h4 class="mb-3 mt-4 text-light"><i class="fa-solid fa-check-circle text-success me-2"></i>Execution Results</h4>
+                
+                {% for command, output in results.items() %}
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <i class="fa-solid fa-angle-right"></i> {{ command }}
+                        </div>
+                        <pre>{{ output }}</pre>
+                    </div>
+                {% endfor %}
+                
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (Optional, for future interactivity) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
